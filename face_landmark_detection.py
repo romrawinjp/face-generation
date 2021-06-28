@@ -53,6 +53,14 @@ def mediapipe_detector(image):
     y_px = min(math.floor(normalized_y * image_height), image_height - 1)
     return x_px, y_px
 
+  def create_np_landmark(image_landmark):
+    for i, points in enumerate(image_landmark[0].landmark):
+      if i == 0: 
+        np_keypoint = np.array([[points.x, points.y, points.z]])
+      else: 
+        np_keypoint = np.concatenate((np_keypoint, np.array([[points.x, points.y, points.z]])), axis=0)
+    return np_keypoint
+
   circleDrawingSpec = mp_drawing.DrawingSpec(thickness=2, circle_radius=2, color=(0,255,0))
   lineDrawingSpec = mp_drawing.DrawingSpec(thickness=2, color=(255,255,255))
 
@@ -81,8 +89,8 @@ def mediapipe_detector(image):
       face_coor_landmark = []
       for c, landmark_px in enumerate(idx_to_coordinates.values()):
         x, y = landmark_px
-        font_size = (image.shape[0])*0.0005
-        dot_size = (image.shape[0])*0.002
+        font_size = (image.shape[0])*0.0003
+        dot_size = (image.shape[0])*0.001
         face_coor_landmark.append([x, y])
         cv2.circle(annotated_image, landmark_px,  int(dot_size), dot_color)
         cv2.putText(annotated_image, str(c), landmark_px, 
@@ -100,8 +108,9 @@ def mediapipe_detector(image):
         if start_idx in idx_to_coordinates and end_idx in idx_to_coordinates:
           cv2.line(annotated_image, idx_to_coordinates[start_idx], idx_to_coordinates[end_idx], dot_color, int(dot_size))
       
+      face_landmark_3d = create_np_landmark(image_landmark)
       face_landmark_2d = np.array(face_coor_landmark)
-  return annotated_image, face_landmark_2d
+  return annotated_image, face_landmark_2d, face_landmark_3d
 
 ####### Function Template #######
 # def my_function():
