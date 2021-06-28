@@ -23,7 +23,6 @@ def dlib_detector(image):
   for (i, rect) in enumerate(rects):
     shape = predictor(gray, rect)
     shape = face_utils.shape_to_np(shape)
-    face_landmark.append(shape)
   
   # Mark point and number of face landmark on the image 
   c = 0 
